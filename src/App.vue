@@ -1,32 +1,44 @@
 <template>
-  <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div>
-    <router-view />
-  </div>
+	<div>
+		<button id="app" @click="go">
+			abc
+		</button>
+		<div @click="shot" style="background: green;height: 100px;width: 100px;">bb</div>
+		<video autoplay ref="v"></video>
+	</div>
 </template>
 
+<script>
+export default {
+	name: "app",
+	methods: {
+		go() {
+			console.log(navigator.mediaDevices?.getUserMedia);
+		},
+		shot() {
+			const constraints = {
+				video: true
+			};
+			const vm = this;
+			navigator.mediaDevices.getUserMedia(constraints).then(stream => {
+				vm.$refs.v.srcObject = stream;
+			});
+		}
+	},
+	computed: {
+		bb() {
+			return navigator.mediaDevices?.getUserMedia;
+		}
+	}
+};
+</script>
+
 <style lang="scss">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
-
-#nav {
-  padding: 30px;
-
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-
-    &.router-link-exact-active {
-      color: #42b983;
-    }
-  }
+body {
+	margin: 0;
+	display: grid;
+	justify-content: center;
+	align-items: center;
+	height: 100vh;
 }
 </style>
