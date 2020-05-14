@@ -1,30 +1,43 @@
 <template>
 	<div>
+		<div>{{ "intrinsic width: " + intrinsicWidth }}</div>
+		<div>{{ "intrinsic height: " + intrinsicHeight }}</div>
+		<div>{{ "viewport width: " + viewportWidth }}</div>
+		<div>{{ "viewport height: " + viewportHeight }}</div>
+		<div>{{ "screen height: " + screenHeight }}</div>
+		<div>{{ "screen width: " + screenWidth }}</div>
 		<div class="camera">
-			<video id="video">Video stream not available.</video>
+			<video id="video" autoplay playsinline muted>Video stream not available.</video>
 			<button id="startbutton">Take photo</button>
 		</div>
-		<canvas id="canvas"></canvas>
+		<canvas id="canvas"> </canvas>
 		<div class="output">
 			<img id="photo" alt="The screen capture will appear in this box." />
 		</div>
-		<div>{{ ua }}</div>
 	</div>
 </template>
 
 <script>
 /* eslint-disable */
+
 export default {
-	name: "app",
-	methods: {},
-	computed: {
-		ua() {
-			return navigator.userAgent.toLowerCase();
-		}
+	name: "App",
+	data() {
+		return {
+			intrinsicWidth: 0,
+			intrinsicHeight: 0,
+			viewportWidth: 0,
+			viewportHeight: 0,
+			screenWidth: 0,
+			screenHeight: 0
+		};
 	},
+	methods: {},
 	mounted() {
-		var width = 320; // 把照片的宽度缩放到这么大
-		var height = 0; // 这个会根据 input stream 进行计算
+		const vm = this;
+
+		var width = 320; // We will scale the photo width to this
+		var height = 0; // This will be computed based on the input stream
 
 		var streaming = false;
 
@@ -38,9 +51,9 @@ export default {
 		photo = document.getElementById("photo");
 		startbutton = document.getElementById("startbutton");
 
-		// 获取 media stream
+		// 获取媒体流
 		navigator.mediaDevices
-			.getUserMedia({ video: true, audio: false })
+			.getUserMedia({ video: true, audio: true })
 			.then(function(stream) {
 				video.srcObject = stream;
 				// video.play();
@@ -48,26 +61,23 @@ export default {
 			.catch(function(err) {
 				console.log("An error occurred: " + err);
 			});
+
+		// 设置 canplay 事件，准备去拿 video 的 intrinsic 高宽
+		video.addEventListener("canplay", function(ev) {
+			if (!streaming) {
+				// height = video.videoHeight / (video.videoWeight/width)
+				setTimeout(() => {
+					vm.intrinsicWidth = video.videoWidth;
+					vm.intrinsicHeight = video.videoHeight;
+					vm.viewportWidth = document.body.clientWidth;
+					vm.viewportHeight = document.body.clientHeight;
+					vm.screenWidth = screen.width;
+					vm.screenHeight = screen.height;
+				}, 200);
+			}
+		});
 	}
 };
 </script>
 
-<style lang="scss">
-body {
-	margin: 0;
-	display: grid;
-	justify-content: center;
-	align-items: center;
-	height: 100vh;
-}
-#video {
-	transform: scaleX(-1);
-	position: fixed;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	width: 100vw;
-	height: 100vh;
-}
-</style>
+<style></style>
